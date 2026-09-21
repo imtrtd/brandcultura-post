@@ -33,7 +33,7 @@ function readFile(file: File): Promise<string> {
 export function CarouselEditor() {
   const [project, setProject] = useState<Project>(defaultProject);
   const [slide, setSlide] = useState(0);
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string | null>("s1-title");
   const [overlays, setOverlays] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -203,7 +203,7 @@ export function CarouselEditor() {
                 type="button"
                 onClick={() => {
                   setSlide(i);
-                  setSelected(null);
+                  setSelected(i === 0 ? "s1-title" : i === 1 ? "s2-title" : "s3-title");
                 }}
                 className="flex-1 rounded-sm py-1.5 text-[11px] font-extrabold tracking-wide"
                 style={{
@@ -276,15 +276,21 @@ export function CarouselEditor() {
       </aside>
 
       <main className="relative order-1 flex min-h-0 min-w-0 flex-1 flex-col items-center overflow-hidden px-3 py-3 md:order-none md:px-7 md:py-4">
-        <div className="order-2 flex w-full max-w-[520px] shrink-0 flex-nowrap items-center justify-start gap-1.5 overflow-x-auto py-1 md:order-1 md:flex-wrap md:justify-center md:gap-2">
-          <ToolBtn onClick={() => markInput.current?.click()} icon={<Upload className="size-3.5" />} label="Upload mark" />
-          <ToolBtn onClick={() => photoInput.current?.click()} icon={<Upload className="size-3.5" />} label="Upload photo" />
-          <ToolBtn onClick={() => bgInput.current?.click()} icon={<Upload className="size-3.5" />} label="Upload bg" />
-          <ToolBtn onClick={() => jsonInput.current?.click()} icon={<Upload className="size-3.5" />} label="Upload JSON" />
-          <span className="mx-1 hidden h-4 w-px bg-[#252525] sm:block" />
-          <ToolBtn onClick={downloadPng} icon={<Download className="size-3.5" />} label={busy === "png" ? "Saving…" : "Download PNG"} primary disabled={!!busy} />
-          <ToolBtn onClick={downloadZip} icon={<Download className="size-3.5" />} label={busy === "zip" ? "Zipping…" : "Download ZIP"} disabled={!!busy} />
-          <ToolBtn onClick={downloadJson} icon={<Download className="size-3.5" />} label="Download JSON" />
+        <div className="order-2 flex w-full max-w-[560px] shrink-0 flex-nowrap items-center justify-start gap-1 overflow-x-auto py-1 md:order-1 md:flex-wrap md:justify-center md:gap-1.5">
+          <span className="hidden pr-1 text-[8px] font-bold tracking-[1.6px] text-[#4A4A4A] uppercase sm:inline">
+            Upload
+          </span>
+          <ToolBtn onClick={() => markInput.current?.click()} icon={<Upload className="size-3.5" />} label="Upload mark" short="Mark" />
+          <ToolBtn onClick={() => photoInput.current?.click()} icon={<Upload className="size-3.5" />} label="Upload photo" short="Photo" />
+          <ToolBtn onClick={() => bgInput.current?.click()} icon={<Upload className="size-3.5" />} label="Upload background" short="Bg" />
+          <ToolBtn onClick={() => jsonInput.current?.click()} icon={<Upload className="size-3.5" />} label="Upload JSON project" short="JSON" />
+          <span className="mx-1 h-4 w-px shrink-0 bg-[#252525]" />
+          <span className="hidden pr-1 text-[8px] font-bold tracking-[1.6px] text-[#4A4A4A] uppercase sm:inline">
+            Download
+          </span>
+          <ToolBtn onClick={downloadPng} icon={<Download className="size-3.5" />} label={busy === "png" ? "Saving…" : "Download PNG"} short={busy === "png" ? "…" : "PNG"} primary disabled={!!busy} />
+          <ToolBtn onClick={downloadZip} icon={<Download className="size-3.5" />} label={busy === "zip" ? "Zipping…" : "Download ZIP"} short={busy === "zip" ? "…" : "ZIP"} disabled={!!busy} />
+          <ToolBtn onClick={downloadJson} icon={<Download className="size-3.5" />} label="Download JSON" short="JSON" />
         </div>
 
         <div className="order-3 flex shrink-0 gap-2 py-1 md:order-2">
@@ -292,7 +298,10 @@ export function CarouselEditor() {
             <button
               key={i}
               type="button"
-              onClick={() => setSlide(i)}
+              onClick={() => {
+                setSlide(i);
+                setSelected(i === 0 ? "s1-title" : i === 1 ? "s2-title" : "s3-title");
+              }}
               className="h-2 rounded-full border-0 transition-all"
               style={{
                 width: slide === i ? 24 : 8,
@@ -335,7 +344,10 @@ export function CarouselEditor() {
           <button
             type="button"
             disabled={slide === 0}
-            onClick={() => setSlide((s) => Math.max(0, s - 1))}
+            onClick={() => {
+              setSlide((s) => Math.max(0, s - 1));
+              setSelected(slide <= 1 ? "s1-title" : "s2-title");
+            }}
             className="text-xs font-extrabold tracking-[2px] text-bc-pink disabled:opacity-20"
           >
             ← PREV
@@ -346,7 +358,10 @@ export function CarouselEditor() {
           <button
             type="button"
             disabled={slide === 2}
-            onClick={() => setSlide((s) => Math.min(2, s + 1))}
+            onClick={() => {
+              setSlide((s) => Math.min(2, s + 1));
+              setSelected(slide >= 1 ? "s3-title" : "s2-title");
+            }}
             className="text-xs font-extrabold tracking-[2px] text-bc-pink disabled:opacity-20"
           >
             NEXT →
@@ -516,12 +531,14 @@ function ToolBtn({
   onClick,
   icon,
   label,
+  short,
   primary,
   disabled,
 }: {
   onClick: () => void;
   icon: ReactNode;
   label: string;
+  short?: string;
   primary?: boolean;
   disabled?: boolean;
 }) {
@@ -540,8 +557,7 @@ function ToolBtn({
       }}
     >
       {icon}
-      <span className="hidden whitespace-nowrap sm:inline">{label}</span>
-      <span className="sr-only sm:hidden">{label}</span>
+      <span className="whitespace-nowrap">{short ?? label}</span>
     </button>
   );
 }

@@ -68,7 +68,11 @@ export function OverlayBox({
       style={{
         ...style,
         transform: `translate(${offset.x}%, ${offset.y}%)`,
-        outline: show && selected ? `1.5px solid ${BC.pink}` : undefined,
+        outline: show
+          ? selected
+            ? `1.5px solid ${BC.pink}`
+            : `1px dashed rgba(255,43,138,0.45)`
+          : undefined,
         outlineOffset: 4,
         cursor: show ? "move" : "default",
         zIndex: selected ? 20 : undefined,

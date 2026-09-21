@@ -122,7 +122,7 @@ export const DEFAULT_SLIDE3: Slide3 = {
     { label: "Duration", value: "3–5 weeks" },
   ],
   cta: "REQUEST PACKAGE →",
-  footer: "brandcultura.agency",
+  footer: "brandcultura.art",
 };
 
 export const MARK_SRC = "/brandcultura-mark.png";
