@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 import { LANGS, useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { AuthSlot } from "@/components/auth-slot";
+import { SiteLogo } from "@/components/site-logo";
 
 const NAV = [
   { to: "/", hash: "", key: "nav.site", match: "/" },
@@ -42,22 +43,7 @@ export function SiteHeader() {
           })}
         </nav>
 
-        <Link
-          to="/"
-          className="group flex flex-col items-center px-3 py-1 no-underline"
-          title="NAMENLOS · VIKTORIIA"
-        >
-          <span className="font-display text-[1.35rem] font-semibold leading-none tracking-[0.18em] text-fg group-hover:text-yellow sm:text-[1.55rem]">
-            NAMENLOS{" "}
-            <span className="text-[0.55em] tracking-[0.22em] text-yellow">
-              tattoo
-            </span>
-          </span>
-          <span className="mt-1 h-px w-16 bg-yellow/80" />
-          <span className="mt-1 font-display text-[0.62rem] font-medium tracking-[0.42em] text-yellow">
-            VIKTORIIA
-          </span>
-        </Link>
+        <SiteLogo />
 
         <div className="flex items-center justify-end gap-1">
           <div className="hidden items-center sm:flex" role="group" aria-label="Language">

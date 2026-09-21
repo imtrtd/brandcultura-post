@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useI18n } from "@/lib/i18n";
 import { SITE } from "@/lib/site";
+import { SiteLogo } from "@/components/site-logo";
 
 export function SiteFooter() {
   const { t } = useI18n();
@@ -8,10 +9,7 @@ export function SiteFooter() {
     <footer className="mt-auto border-t border-yellow/20 bg-ink/80">
       <div className="mx-auto grid max-w-6xl gap-8 px-5 py-10 sm:grid-cols-3">
         <div>
-          <p className="font-display text-2xl tracking-[0.16em] text-fg">NAMENLOS</p>
-          <p className="mt-1 font-display text-xs tracking-[0.35em] text-yellow">
-            VIKTORIIA
-          </p>
+          <SiteLogo className="items-start px-0" />
           <p className="mt-3 text-sm text-muted">
             Tattoo artist
             <br />

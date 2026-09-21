@@ -10,7 +10,7 @@ import { I18nProvider } from "@/lib/i18n";
 import { Toaster } from "sonner";
 import appCss from "../styles.css?url";
 
-const APP_NAME = "NAMENLOS Tattoo";
+const APP_NAME = "Brandcultura Post";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -21,7 +21,7 @@ export const Route = createRootRoute({
       {
         name: "description",
         content:
-          "NAMENLOS — Viktoriia. Custom tattoo, fine line, lettering, graphic. Nuremberg / Kyiv. Use the pain as fuel.",
+          "Design and export Instagram carousel posts for Brandcultura — 1080×1080 slides, overlays, upload and download.",
       },
       { name: "theme-color", content: "#050505" },
     ],
@@ -30,12 +30,6 @@ export const Route = createRootRoute({
       { rel: "stylesheet", href: appCss },
       { rel: "manifest", href: "/__grok/manifest.webmanifest" },
       { rel: "apple-touch-icon", href: "/__grok/icon-180.png" },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@500;600;700&family=Cinzel:wght@600;700&family=Special+Elite&family=UnifrakturMaguntia&family=Marck+Script&family=Russo+One&family=Yanone+Kaffeesatz:wght@600;700&family=Metal+Mania&family=Permanent+Marker&display=swap",
-      },
     ],
   }),
   component: Root,
@@ -57,10 +51,10 @@ function Root() {
               position="bottom-center"
               toastOptions={{
                 style: {
-                  background: "#0a0a0a",
-                  border: "1px solid #f5c518",
+                  background: "#0d0d0d",
+                  border: "1px solid #FF2B8A",
                   color: "#f5f5f5",
-                  borderRadius: 0,
+                  borderRadius: 4,
                 },
               }}
             />

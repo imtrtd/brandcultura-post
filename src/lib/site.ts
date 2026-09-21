@@ -1,6 +1,7 @@
 export const SITE = {
-  name: "NAMENLOS",
+  name: "NAMENLOS TATTOO",
   artist: "Viktoriia",
+  lockup: "NAMENLOS tattoo Viktoriia",
   ig: "https://instagram.com/namenlos_tattoo",
   igHandle: "@namenlos_tattoo",
   tg: "https://t.me/imtryingtodesign",

@@ -9,14 +9,21 @@
   --color-yellow-hot: #ffe14a;
   --color-line: #4a3d12;
   --color-danger: #ff2d2d;
+  --color-bc-bg: #050505;
+  --color-bc-pink: #ff2b8a;
+  --color-bc-lime: #c6ef00;
+  --color-bc-white: #ffffff;
+  --color-bc-dim: #b8b8b8;
+  --color-bc-panel: #0d0d0d;
+  --color-bc-line: #1c1c1c;
   --font-sans: "Inter", system-ui, sans-serif;
   --font-display: "Oswald", "Montserrat", "Inter", system-ui, sans-serif;
-  --radius-sm: 0px;
-  --radius-md: 0px;
-  --radius-lg: 0px;
-  --radius-xl: 0px;
-  --radius-2xl: 0px;
-  --radius: 0px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius: 8px;
 }
 
 @layer base {
@@ -40,59 +47,7 @@
   }
 
   ::selection {
-    background: var(--color-yellow);
-    color: #000;
-  }
-
-  h1,
-  h2,
-  h3 {
-    text-wrap: balance;
-  }
-
-  p {
-    text-wrap: pretty;
+    background: var(--color-bc-pink);
+    color: #fff;
   }
 }
-
-.tape-stripes {
-  background: repeating-linear-gradient(
-    -45deg,
-    #f5c518 0 10px,
-    #0a0a0a 10px 20px
-  );
-}
-
-.wall-veil {
-  background-color: #050505;
-  background-image:
-    linear-gradient(rgba(5, 5, 5, 0.42), rgba(5, 5, 5, 0.62)),
-    url("/images/wall_punk.jpg");
-  background-size: cover;
-  background-position: center top;
-  background-attachment: scroll;
-}
-
-@media (min-width: 901px) {
-  .wall-veil {
-    background-attachment: fixed;
-  }
-}
-
-.legal-body ul {
-  list-style: disc;
-  padding-left: 1.15rem;
-}
-
-.legal-body li {
-  margin-bottom: 0.35rem;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
