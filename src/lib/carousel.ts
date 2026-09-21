@@ -60,8 +60,11 @@ export type Slide3 = {
   footer: string;
 };
 
+export type KitId = "all" | "mark" | "release" | "system" | "mix";
+
 export type Project = {
   v: 1;
+  kit: KitId;
   layers: Layers;
   slide1: Slide1;
   slide2: Slide2;
@@ -85,55 +88,236 @@ export const WAVE_B = [
   123, 183, 211, 206, 171, 119, 63, 65, 95, 105,
 ];
 
-export const DEFAULT_SLIDE1: Slide1 = {
-  slideNum: "01 / 03",
-  title: "01 MARK",
-  subtitle: "WITHOUT A NAME",
-  body: [
-    "For artists without a name or face.",
-    "No logo, no grid, no recognizable project yet.",
-    "Become nameable and recognizable",
-    "before your first big release.",
-  ],
-  footerLabel: "STRATEGY · IDENTITY · PRE-RECOGNITION",
-  footerSlide: "SLIDE 1 / 3",
+/** Three kits + MIX — from handwritten brief + live brandcultura.art */
+export const KITS: Record<
+  KitId,
+  { label: string; slide1: Slide1; slide2: Slide2; slide3: Slide3 }
+> = {
+  all: {
+    label: "All kits",
+    slide1: {
+      slideNum: "01 / 03",
+      title: "3 KITS",
+      subtitle: "ONE MIX",
+      body: [
+        "MARK — no name, no face, no grid yet.",
+        "RELEASE — tracks exist. The post still looks like a story.",
+        "SYSTEM — people come. Site is dead. No collab door.",
+        "Trampoline, not decoration. Then you grow.",
+      ],
+      footerLabel: "STRATEGY · IDENTITY · GROWTH",
+      footerSlide: "SLIDE 1 / 3",
+    },
+    slide2: {
+      slideNum: "02 / 03",
+      h1: "WHAT'S",
+      h2: "INCLUDED",
+      items: [
+        "MARK: logo, 2 colors, 1 type pair, avatar, 1-page guide",
+        "RELEASE: cover + stream square, 3–5 grid, mini-site",
+        "SYSTEM: audit, site, collab-block, cover-system + presskit",
+        "MIX: merch, stickers, print, special — on brief",
+      ],
+    },
+    slide3: {
+      slideNum: "03 / 03",
+      h1: "PRICE",
+      h2: "TIMELINE",
+      rows: [
+        { label: "MARK · 7–10 days", value: "360 €" },
+        { label: "RELEASE · 10–14 days", value: "850 €" },
+        { label: "SYSTEM · 3–5 weeks", value: "2 200 €" },
+        { label: "MIX · on brief", value: "quote" },
+      ],
+      cta: "REQUEST KIT →",
+      footer: "brandcultura.art",
+    },
+  },
+  mark: {
+    label: "MARK",
+    slide1: {
+      slideNum: "01 / 03",
+      title: "01 MARK",
+      subtitle: "WITHOUT A NAME",
+      body: [
+        "For artists without a name or face.",
+        "No logo, no grid, no recognizable project yet.",
+        "Become nameable and recognizable",
+        "before your first big release.",
+      ],
+      footerLabel: "STRATEGY · IDENTITY · PRE-RECOGNITION",
+      footerSlide: "SLIDE 1 / 3",
+    },
+    slide2: {
+      slideNum: "02 / 03",
+      h1: "WHAT'S",
+      h2: "INCLUDED",
+      items: [
+        "Logo: one direction, one finale",
+        "Short code: 2 colors, 1 type pair",
+        "Avatar + social cover",
+        "1-page guide: how you use it",
+      ],
+    },
+    slide3: {
+      slideNum: "03 / 03",
+      h1: "PRICE",
+      h2: "TIMELINE",
+      rows: [
+        { label: "List price", value: "360 €" },
+        { label: "Focus / Case", value: "280 €" },
+        { label: "Deposit", value: "120 €" },
+        { label: "Duration", value: "7–10 days" },
+      ],
+      cta: "REQUEST MARK →",
+      footer: "brandcultura.art",
+    },
+  },
+  release: {
+    label: "RELEASE",
+    slide1: {
+      slideNum: "01 / 03",
+      title: "02 RELEASE",
+      subtitle: "LITTLE KNOWN",
+      body: [
+        "Tracks on SoundCloud or Spotify.",
+        "Instagram and a rough portfolio exist.",
+        "The release should look like a release —",
+        "not like a story from the phone.",
+      ],
+      footerLabel: "COVER · GRID · MINI-SITE",
+      footerSlide: "SLIDE 1 / 3",
+    },
+    slide2: {
+      slideNum: "02 / 03",
+      h1: "WHAT'S",
+      h2: "INCLUDED",
+      items: [
+        "Cover + square for streaming",
+        "3–5 grid pieces: post, story, promo",
+        "Mini-site or portfolio page",
+        "Existing logo stays if it still holds",
+      ],
+    },
+    slide3: {
+      slideNum: "03 / 03",
+      h1: "PRICE",
+      h2: "TIMELINE",
+      rows: [
+        { label: "List price", value: "850 €" },
+        { label: "Focus / Case", value: "650 €" },
+        { label: "Deposit", value: "250 €" },
+        { label: "Duration", value: "10–14 days" },
+      ],
+      cta: "REQUEST RELEASE →",
+      footer: "brandcultura.art",
+    },
+  },
+  system: {
+    label: "SYSTEM",
+    slide1: {
+      slideNum: "01 / 03",
+      title: "03 SYSTEM",
+      subtitle: "GAINING",
+      body: [
+        "You already pull people in — or you're known.",
+        "Strong covers. Daily output. Dead site.",
+        "No door for collabs.",
+        "Not a prettier picture. A working shell.",
+      ],
+      footerLabel: "AUDIT · SITE · COLLAB · PRESSKIT",
+      footerSlide: "SLIDE 1 / 3",
+    },
+    slide2: {
+      slideNum: "02 / 03",
+      h1: "WHAT'S",
+      h2: "INCLUDED",
+      items: [
+        "Audit: what stays, what dies",
+        "Site: Releases, Dates, People, Contact",
+        "Collab-Block: who, how, framework",
+        "Cover-System for a series + Presskit",
+      ],
+    },
+    slide3: {
+      slideNum: "03 / 03",
+      h1: "PRICE",
+      h2: "TIMELINE",
+      rows: [
+        { label: "List price", value: "2 200 €" },
+        { label: "Focus / Case", value: "1 600 €" },
+        { label: "Deposit", value: "500 €" },
+        { label: "Duration", value: "3–5 weeks" },
+      ],
+      cta: "REQUEST SYSTEM →",
+      footer: "brandcultura.art",
+    },
+  },
+  mix: {
+    label: "MIX",
+    slide1: {
+      slideNum: "01 / 03",
+      title: "04 MIX",
+      subtitle: "YOUR BRIEF",
+      body: [
+        "No ready-made step. Your own stack.",
+        "Logo, cover, site, grid, presskit, strategy.",
+        "Merch, stickers, print — if the brief needs it.",
+        "Clear scope and price before we start.",
+      ],
+      footerLabel: "MODULES · SPECIAL · ON BRIEF",
+      footerSlide: "SLIDE 1 / 3",
+    },
+    slide2: {
+      slideNum: "02 / 03",
+      h1: "WHAT'S",
+      h2: "INCLUDED",
+      items: [
+        "Modules from MARK / RELEASE / SYSTEM",
+        "Only what the brief actually needs",
+        "Merch · stickers · print on request",
+        "Two revision rounds, same as fixed kits",
+      ],
+    },
+    slide3: {
+      slideNum: "03 / 03",
+      h1: "PRICE",
+      h2: "TIMELINE",
+      rows: [
+        { label: "List price", value: "on brief" },
+        { label: "Focus / Case", value: "quote" },
+        { label: "Deposit", value: "by scope" },
+        { label: "Duration", value: "by brief" },
+      ],
+      cta: "REQUEST MIX →",
+      footer: "brandcultura.art",
+    },
+  },
 };
 
-export const DEFAULT_SLIDE2: Slide2 = {
-  slideNum: "02 / 03",
-  h1: "WHAT'S",
-  h2: "INCLUDED",
-  items: [
-    "Audit: what stays, what dies",
-    "Site: Releases, Dates, People, Contact",
-    "Collab-Block: who, how, framework",
-    "Cover-System for a series + Presskit",
-  ],
-};
+export const KIT_ORDER: KitId[] = ["all", "mark", "release", "system", "mix"];
 
-export const DEFAULT_SLIDE3: Slide3 = {
-  slideNum: "03 / 03",
-  h1: "PRICE",
-  h2: "TIMELINE",
-  rows: [
-    { label: "List price", value: "2200 €" },
-    { label: "Focus / Case", value: "1600 €" },
-    { label: "Deposit", value: "500 €" },
-    { label: "Duration", value: "3–5 weeks" },
-  ],
-  cta: "REQUEST PACKAGE →",
-  footer: "brandcultura.art",
-};
+export const DEFAULT_SLIDE1: Slide1 = KITS.all.slide1;
+export const DEFAULT_SLIDE2: Slide2 = KITS.all.slide2;
+export const DEFAULT_SLIDE3: Slide3 = KITS.all.slide3;
 
 export const MARK_SRC = "/brandcultura-mark.png";
+
+export function slidesFromKit(kit: KitId) {
+  const k = KITS[kit];
+  return {
+    kit,
+    slide1: structuredClone(k.slide1),
+    slide2: structuredClone(k.slide2),
+    slide3: structuredClone(k.slide3),
+  };
+}
 
 export function defaultProject(): Project {
   return {
     v: 1,
+    ...slidesFromKit("all"),
     layers: { ...DEFAULT_LAYERS },
-    slide1: structuredClone(DEFAULT_SLIDE1),
-    slide2: structuredClone(DEFAULT_SLIDE2),
-    slide3: structuredClone(DEFAULT_SLIDE3),
     offsets: {},
     markSrc: MARK_SRC,
     photoSrc: null,
@@ -146,10 +330,12 @@ export function parseProject(raw: unknown): Project | null {
   const p = raw as Partial<Project>;
   if (p.v !== 1 || !p.slide1 || !p.slide2 || !p.slide3) return null;
   const base = defaultProject();
+  const kit = p.kit && p.kit in KITS ? p.kit : "all";
   return {
     ...base,
     ...p,
     v: 1,
+    kit,
     layers: { ...base.layers, ...(p.layers ?? {}) },
     slide1: { ...base.slide1, ...p.slide1 },
     slide2: { ...base.slide2, ...p.slide2 },

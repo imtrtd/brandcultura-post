@@ -3,9 +3,13 @@ import { toast } from "sonner";
 import { Download, Upload, Layers as LayersIcon } from "lucide-react";
 import {
   BC,
+  KIT_ORDER,
+  KITS,
   LAYER_META,
   defaultProject,
   parseProject,
+  slidesFromKit,
+  type KitId,
   type LayerKey,
   type Offset,
   type Project,
@@ -171,6 +175,13 @@ export function CarouselEditor() {
     patch((p) => ({ ...p, layers: { ...p.layers, [key]: !p.layers[key] } }));
   }
 
+  function loadKit(id: KitId) {
+    patch((p) => ({ ...p, ...slidesFromKit(id) }));
+    setSlide(0);
+    setSelected("s1-title");
+    toast.success(`${KITS[id].label} loaded`);
+  }
+
   return (
     <div className="flex h-dvh min-h-0 flex-col overflow-hidden bg-[#070707] text-white md:flex-row" style={{ fontFamily: "Arial, Helvetica, sans-serif" }}>
       <input ref={markInput} type="file" accept="image/*" className="hidden" onChange={onMark} />
@@ -195,6 +206,24 @@ export function CarouselEditor() {
         </div>
 
         <div className="px-3 pt-3">
+          <div className="mb-2 text-[9px] font-bold uppercase tracking-[1.8px] text-[#3D3D3D]">Kit</div>
+          <div className="mb-3 flex flex-wrap gap-1">
+            {KIT_ORDER.map((id) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => loadKit(id)}
+                className="rounded-sm px-1.5 py-1 text-[9px] font-extrabold tracking-[1.2px] uppercase"
+                style={{
+                  background: project.kit === id ? BC.lime : BC.inputBg,
+                  color: project.kit === id ? "#050505" : "#666",
+                  border: `1px solid ${project.kit === id ? BC.lime : BC.inputBorder}`,
+                }}
+              >
+                {id === "all" ? "ALL" : KITS[id].label}
+              </button>
+            ))}
+          </div>
           <div className="mb-2 text-[9px] font-bold uppercase tracking-[1.8px] text-[#3D3D3D]">Slide</div>
           <div className="flex gap-1.5">
             {["01", "02", "03"].map((n, i) => (
