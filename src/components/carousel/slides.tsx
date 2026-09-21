@@ -1,8 +1,13 @@
 import type { ReactNode } from "react";
 import {
   BC,
+  MIX_COLS,
+  MIX_MODULES,
   WAVE_A,
   WAVE_B,
+  countMix,
+  mixCountLabel,
+  type KitId,
   type Layers,
   type Offset,
   type Slide1,
@@ -12,6 +17,9 @@ import {
 import { OverlayBox } from "./overlay";
 
 type Shared = {
+  kit: KitId;
+  mixOn: Record<string, boolean>;
+  onToggleMix: (id: string) => void;
   layers: Layers;
   markSrc: string;
   photoSrc: string | null;
@@ -295,6 +303,7 @@ export function SlideOne({ d, shared }: { d: Slide1; shared: Shared }) {
 
 export function SlideTwo({ d, shared }: { d: Slide2; shared: Shared }) {
   const L = shared.layers;
+  const isMix = shared.kit === "mix";
   return (
     <SlideShell shared={shared}>
       {L.shapes ? (
@@ -313,7 +322,7 @@ export function SlideTwo({ d, shared }: { d: Slide2; shared: Shared }) {
 
       <PhotoLayer shared={shared} id="s2-photo" />
 
-      {L.text ? (
+      {L.text && !isMix ? (
         <OverlayBox
           id="s2-num"
           label="Slide number"
@@ -329,7 +338,7 @@ export function SlideTwo({ d, shared }: { d: Slide2; shared: Shared }) {
         </OverlayBox>
       ) : null}
 
-      {L.brandMark ? (
+      {L.brandMark && !isMix ? (
         <OverlayBox
           id="s2-mark"
           label="Brand Mark"
@@ -353,50 +362,86 @@ export function SlideTwo({ d, shared }: { d: Slide2; shared: Shared }) {
           offset={off(shared.offsets, "s2-title")}
           onSelect={shared.onSelect}
           onOffset={shared.onOffset}
-          style={{ top: "16%", left: "6.5%" }}
+          style={{ top: isMix ? "2.4%" : "16%", left: "5.5%" }}
         >
-          <div
-            className="font-black leading-none text-white"
-            style={{ fontFamily: "Arial Black, Impact, sans-serif", fontSize: "clamp(44px,8.5vh,90px)", letterSpacing: "-2.5px" }}
-          >
-            {d.h1}
-          </div>
-          <div
-            className="font-black leading-none text-bc-lime"
-            style={{ fontFamily: "Arial Black, Impact, sans-serif", fontSize: "clamp(44px,8.5vh,90px)", letterSpacing: "-2.5px" }}
-          >
-            {d.h2}
-          </div>
+          {isMix ? (
+            <div className="flex items-center gap-[0.45em]" style={{ fontSize: "clamp(12px, 2.15vh, 26px)" }}>
+              <span className="shrink-0 text-[0.42em] font-bold tracking-[0.16em] text-bc-pink">
+                {d.slideNum}
+              </span>
+              <div className="h-[0.12em] w-[0.7em] shrink-0 rounded-sm bg-bc-lime" />
+              <div
+                className="font-black leading-none"
+                style={{ fontFamily: "Arial Black, Impact, sans-serif", letterSpacing: "-0.04em" }}
+              >
+                <span className="text-white">{d.h1} </span>
+                <span className="text-bc-lime">{d.h2}</span>
+              </div>
+              <span className="font-mono text-[0.72em] font-bold leading-none text-bc-lime">
+                {countMix(shared.mixOn)}/{MIX_MODULES.length}
+              </span>
+            </div>
+          ) : (
+            <>
+              <div
+                className="font-black leading-none text-white"
+                style={{ fontFamily: "Arial Black, Impact, sans-serif", fontSize: "clamp(44px,8.5vh,90px)", letterSpacing: "-2.5px" }}
+              >
+                {d.h1}
+              </div>
+              <div
+                className="font-black leading-none text-bc-lime"
+                style={{ fontFamily: "Arial Black, Impact, sans-serif", fontSize: "clamp(44px,8.5vh,90px)", letterSpacing: "-2.5px" }}
+              >
+                {d.h2}
+              </div>
+            </>
+          )}
         </OverlayBox>
       ) : null}
 
       {L.text ? (
-        <OverlayBox
-          id="s2-list"
-          label="List"
-          selected={shared.selected === "s2-list"}
-          show={shared.showOverlays}
-          offset={off(shared.offsets, "s2-list")}
-          onSelect={shared.onSelect}
-          onOffset={shared.onOffset}
-          className="max-w-[78%]"
-          style={{ top: "42%", left: "6.5%" }}
-        >
-          {d.items.map((item, i) => (
-            <div key={i} className="mb-[1.1em] flex items-start gap-3">
-              <span className="mt-1 font-mono text-[11px] font-bold tracking-widest text-bc-pink">
-                0{i + 1}
-              </span>
-              <div>
-                <div className="h-px w-10 bg-bc-lime mb-1.5" />
-                <div className="text-[clamp(16px,2.4vh,26px)] font-medium leading-snug text-white">{item}</div>
+        isMix ? (
+          <OverlayBox
+            id="s2-list"
+            label="Mix list"
+            selected={shared.selected === "s2-list"}
+            show={shared.showOverlays}
+            offset={off(shared.offsets, "s2-list")}
+            onSelect={shared.onSelect}
+            onOffset={shared.onOffset}
+            style={{ top: "max(34px, 8.6%)", left: "4.5%", width: "91%", height: "calc(96.5% - max(34px, 8.6%))" }}
+          >
+            <MixChecklist mixOn={shared.mixOn} onToggle={shared.onToggleMix} />
+          </OverlayBox>
+        ) : (
+          <OverlayBox
+            id="s2-list"
+            label="List"
+            selected={shared.selected === "s2-list"}
+            show={shared.showOverlays}
+            offset={off(shared.offsets, "s2-list")}
+            onSelect={shared.onSelect}
+            onOffset={shared.onOffset}
+            className="max-w-[78%]"
+            style={{ top: "42%", left: "6.5%" }}
+          >
+            {d.items.map((item, i) => (
+              <div key={i} className="mb-[1.1em] flex items-start gap-3">
+                <span className="mt-1 font-mono text-[11px] font-bold tracking-widest text-bc-pink">
+                  0{i + 1}
+                </span>
+                <div>
+                  <div className="mb-1.5 h-px w-10 bg-bc-lime" />
+                  <div className="text-[clamp(16px,2.4vh,26px)] font-medium leading-snug text-white">{item}</div>
+                </div>
               </div>
-            </div>
-          ))}
-        </OverlayBox>
+            ))}
+          </OverlayBox>
+        )
       ) : null}
 
-      {L.waveform ? (
+      {L.waveform && !isMix ? (
         <OverlayBox
           id="s2-wave"
           label="Waveform"
@@ -414,8 +459,104 @@ export function SlideTwo({ d, shared }: { d: Slide2; shared: Shared }) {
   );
 }
 
+function MixChecklist({
+  mixOn,
+  onToggle,
+}: {
+  mixOn: Record<string, boolean>;
+  onToggle?: (id: string) => void;
+}) {
+  const byGroup = new Map<string, typeof MIX_MODULES>();
+  for (const m of MIX_MODULES) {
+    const arr = byGroup.get(m.group) ?? [];
+    arr.push(m);
+    byGroup.set(m.group, arr);
+  }
+
+  return (
+    <div
+      className="grid h-full min-h-0 grid-cols-3 overflow-hidden text-[12.5px] max-md:text-[7px]"
+      style={{ columnGap: "2.2%" }}
+    >
+      {MIX_COLS.map((groups, ci) => (
+        <div
+          key={groups.join("-")}
+          className="min-w-0"
+          style={{
+            borderLeft: ci === 0 ? undefined : `1px solid ${BC.pink}28`,
+            paddingLeft: ci === 0 ? 0 : "7%",
+          }}
+        >
+          {groups.map((g) => (
+            <div key={g} className="mb-[0.7em]">
+              <div
+                className="mb-[0.38em] flex items-center gap-[0.4em] font-extrabold tracking-[0.18em] text-bc-pink"
+                style={{ fontSize: "0.72em" }}
+              >
+                <span className="inline-block size-[0.55em] shrink-0 bg-bc-lime" />
+                {g}
+              </div>
+              {(byGroup.get(g) ?? []).map((m) => {
+                const on = !!mixOn[m.id];
+                return (
+                  <button
+                    key={m.id}
+                    type="button"
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggle?.(m.id);
+                    }}
+                    className="mb-[0.18em] flex h-auto w-full min-w-0 items-center gap-[0.42em] overflow-hidden p-0 text-left leading-none whitespace-nowrap"
+                    style={{ cursor: "pointer" }}
+                  >
+                    <span
+                      className="flex shrink-0 items-center justify-center overflow-hidden"
+                      style={{
+                        width: "0.95em",
+                        height: "0.95em",
+                        border: `1.5px solid ${on ? BC.lime : BC.pink}`,
+                        background: on ? BC.lime : "transparent",
+                      }}
+                    >
+                      {on ? (
+                        <svg viewBox="0 0 12 12" className="h-[0.78em] w-[0.78em]" aria-hidden>
+                          <path
+                            d="M2 6.4 4.8 9.2 10 3"
+                            fill="none"
+                            stroke="#050505"
+                            strokeWidth="2.2"
+                            strokeLinecap="square"
+                          />
+                        </svg>
+                      ) : null}
+                    </span>
+                    <span
+                      className="min-w-0 truncate leading-none"
+                      style={{
+                        fontSize: "0.82em",
+                        fontWeight: 500,
+                        color: on ? BC.white : "#555555",
+                        letterSpacing: "0.01em",
+                      }}
+                    >
+                      {m.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function SlideThree({ d, shared }: { d: Slide3; shared: Shared }) {
   const L = shared.layers;
+  const rows =
+    shared.kit === "mix" ? [mixCountLabel(shared.mixOn), ...d.rows.slice(1)] : d.rows;
   return (
     <SlideShell shared={shared}>
       {L.shapes ? (
@@ -501,7 +642,7 @@ export function SlideThree({ d, shared }: { d: Slide3; shared: Shared }) {
           className="w-[87%]"
           style={{ top: "42%", left: "6.5%" }}
         >
-          {d.rows.map((row, i) => (
+          {rows.map((row, i) => (
             <div key={i} className="mb-3 flex items-end justify-between border-b border-white/10 pb-2">
               <span className="text-[clamp(13px,2vh,20px)] font-medium text-bc-dim">{row.label}</span>
               <span className="font-mono text-[clamp(16px,2.6vh,28px)] font-bold text-bc-lime">{row.value}</span>
@@ -569,6 +710,7 @@ function SlideShell({ shared, children }: { shared: Shared; children: ReactNode 
     <div
       className="relative h-full w-full overflow-hidden"
       style={{
+        containerType: "size",
         background: L.background
           ? shared.bgSrc
             ? `center / cover no-repeat url(${shared.bgSrc}), ${BC.bg}`

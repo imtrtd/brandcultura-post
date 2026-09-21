@@ -1,12 +1,17 @@
 import { useCallback, useRef, useState, type ChangeEvent, type ReactNode } from "react";
 import { toast } from "sonner";
-import { Download, Upload, Layers as LayersIcon } from "lucide-react";
+import { Download, Upload, Layers as LayersIcon, Check } from "lucide-react";
 import {
   BC,
   KIT_ORDER,
   KITS,
   LAYER_META,
+  MIX_GROUPS,
+  MIX_MODULES,
+  countMix,
+  defaultMixOn,
   defaultProject,
+  mixCountLabel,
   parseProject,
   slidesFromKit,
   type KitId,
@@ -36,9 +41,9 @@ function readFile(file: File): Promise<string> {
 
 export function CarouselEditor() {
   const [project, setProject] = useState<Project>(defaultProject);
-  const [slide, setSlide] = useState(0);
-  const [selected, setSelected] = useState<string | null>("s1-title");
-  const [overlays, setOverlays] = useState(true);
+  const [slide, setSlide] = useState(1);
+  const [selected, setSelected] = useState<string | null>("s2-list");
+  const [overlays, setOverlays] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const markInput = useRef<HTMLInputElement>(null);
@@ -51,6 +56,9 @@ export function CarouselEditor() {
   }, []);
 
   const shared = {
+    kit: project.kit,
+    mixOn: project.mixOn,
+    onToggleMix: (id: string) => toggleMix(id),
     layers: project.layers,
     markSrc: project.markSrc,
     photoSrc: project.photoSrc,
@@ -62,6 +70,26 @@ export function CarouselEditor() {
     onOffset: (id: string, next: Offset) =>
       patch((p) => ({ ...p, offsets: { ...p.offsets, [id]: next } })),
   };
+
+  function withMix(p: Project, mixOn: Record<string, boolean>): Project {
+    const rows = p.slide3.rows.map((r, i) => (i === 0 ? mixCountLabel(mixOn) : r));
+    return { ...p, mixOn, slide3: { ...p.slide3, rows } };
+  }
+
+  function toggleMix(id: string) {
+    patch((p) => withMix(p, { ...p.mixOn, [id]: !p.mixOn[id] }));
+  }
+
+  function setMixAll(on: boolean) {
+    patch((p) => withMix(p, defaultMixOn(on)));
+  }
+
+  function goSlide(i: number) {
+    setSlide(i);
+    setSelected(
+      i === 0 ? "s1-title" : i === 1 ? (project.kit === "mix" ? "s2-list" : "s2-title") : "s3-title",
+    );
+  }
 
   async function capture(index: number, hideOverlay: boolean) {
     const prev = slide;
@@ -176,9 +204,18 @@ export function CarouselEditor() {
   }
 
   function loadKit(id: KitId) {
-    patch((p) => ({ ...p, ...slidesFromKit(id) }));
-    setSlide(0);
-    setSelected("s1-title");
+    patch((p) => {
+      const next = { ...p, ...slidesFromKit(id) };
+      if (id === "mix") return withMix(next, p.mixOn);
+      return next;
+    });
+    if (id === "mix") {
+      setSlide(1);
+      setSelected("s2-list");
+    } else {
+      setSlide(0);
+      setSelected("s1-title");
+    }
     toast.success(`${KITS[id].label} loaded`);
   }
 
@@ -230,10 +267,7 @@ export function CarouselEditor() {
               <button
                 key={n}
                 type="button"
-                onClick={() => {
-                  setSlide(i);
-                  setSelected(i === 0 ? "s1-title" : i === 1 ? "s2-title" : "s3-title");
-                }}
+                onClick={() => goSlide(i)}
                 className="flex-1 rounded-sm py-1.5 text-[11px] font-extrabold tracking-wide"
                 style={{
                   background: slide === i ? BC.pink : BC.inputBg,
@@ -327,10 +361,7 @@ export function CarouselEditor() {
             <button
               key={i}
               type="button"
-              onClick={() => {
-                setSlide(i);
-                setSelected(i === 0 ? "s1-title" : i === 1 ? "s2-title" : "s3-title");
-              }}
+              onClick={() => goSlide(i)}
               className="h-2 rounded-full border-0 transition-all"
               style={{
                 width: slide === i ? 24 : 8,
@@ -373,10 +404,7 @@ export function CarouselEditor() {
           <button
             type="button"
             disabled={slide === 0}
-            onClick={() => {
-              setSlide((s) => Math.max(0, s - 1));
-              setSelected(slide <= 1 ? "s1-title" : "s2-title");
-            }}
+            onClick={() => goSlide(slide - 1)}
             className="text-xs font-extrabold tracking-[2px] text-bc-pink disabled:opacity-20"
           >
             ← PREV
@@ -387,10 +415,7 @@ export function CarouselEditor() {
           <button
             type="button"
             disabled={slide === 2}
-            onClick={() => {
-              setSlide((s) => Math.min(2, s + 1));
-              setSelected(slide >= 1 ? "s3-title" : "s2-title");
-            }}
+            onClick={() => goSlide(slide + 1)}
             className="text-xs font-extrabold tracking-[2px] text-bc-pink disabled:opacity-20"
           >
             NEXT →
@@ -432,21 +457,31 @@ export function CarouselEditor() {
             <Field label="Slide number" value={project.slide2.slideNum} onChange={(v) => patch((p) => ({ ...p, slide2: { ...p.slide2, slideNum: v } }))} />
             <Field label="Heading line 1" value={project.slide2.h1} onChange={(v) => patch((p) => ({ ...p, slide2: { ...p.slide2, h1: v } }))} />
             <Field label="Heading line 2" value={project.slide2.h2} onChange={(v) => patch((p) => ({ ...p, slide2: { ...p.slide2, h2: v } }))} />
-            <Sect>List Items</Sect>
-            {project.slide2.items.map((item, i) => (
-              <Field
-                key={i}
-                label={`Item ${i + 1}`}
-                value={item}
-                onChange={(v) =>
-                  patch((p) => {
-                    const items = [...p.slide2.items];
-                    items[i] = v;
-                    return { ...p, slide2: { ...p.slide2, items } };
-                  })
-                }
+            {project.kit === "mix" ? (
+              <MixTicks
+                mixOn={project.mixOn}
+                onToggle={toggleMix}
+                onAll={setMixAll}
               />
-            ))}
+            ) : (
+              <>
+                <Sect>List Items</Sect>
+                {project.slide2.items.map((item, i) => (
+                  <Field
+                    key={i}
+                    label={`Item ${i + 1}`}
+                    value={item}
+                    onChange={(v) =>
+                      patch((p) => {
+                        const items = [...p.slide2.items];
+                        items[i] = v;
+                        return { ...p, slide2: { ...p.slide2, items } };
+                      })
+                    }
+                  />
+                ))}
+              </>
+            )}
           </>
         ) : null}
         {slide === 2 ? (
@@ -553,6 +588,79 @@ function Sect({ children }: { children: string }) {
     <div className="mt-4 mb-2 border-t border-bc-line pt-3 text-[9px] font-bold uppercase tracking-[1.8px] text-[#3D3D3D]">
       {children}
     </div>
+  );
+}
+
+function MixTicks({
+  mixOn,
+  onToggle,
+  onAll,
+}: {
+  mixOn: Record<string, boolean>;
+  onToggle: (id: string) => void;
+  onAll: (on: boolean) => void;
+}) {
+  const n = countMix(mixOn);
+  return (
+    <>
+      <Sect>Mix modules</Sect>
+      <div className="mb-2 flex items-center justify-between">
+        <span className="font-mono text-[11px] font-bold text-bc-lime">
+          {n} / {MIX_MODULES.length}
+        </span>
+        <div className="flex gap-1">
+          <button
+            type="button"
+            onClick={() => onAll(true)}
+            className="rounded-sm px-1.5 py-0.5 text-[9px] font-extrabold tracking-[1.2px] uppercase"
+            style={{ background: BC.lime, color: BC.bg }}
+          >
+            All
+          </button>
+          <button
+            type="button"
+            onClick={() => onAll(false)}
+            className="rounded-sm px-1.5 py-0.5 text-[9px] font-extrabold tracking-[1.2px] uppercase"
+            style={{ background: BC.inputBg, color: "#888", border: `1px solid ${BC.inputBorder}` }}
+          >
+            None
+          </button>
+        </div>
+      </div>
+      {MIX_GROUPS.map((g) => (
+        <div key={g} className="mb-2">
+          <div className="mb-1 flex items-center gap-1.5 text-[8px] font-extrabold tracking-[1.8px] text-bc-pink">
+            <span className="inline-block size-1.5 bg-bc-lime" />
+            {g}
+          </div>
+          {MIX_MODULES.filter((m) => m.group === g).map((m) => {
+            const on = !!mixOn[m.id];
+            return (
+              <button
+                key={m.id}
+                type="button"
+                onClick={() => onToggle(m.id)}
+                className="mb-px flex w-full items-center gap-1.5 rounded-sm px-1 py-0.5 text-left"
+                style={{ background: on ? "#141414" : "transparent" }}
+              >
+                <span
+                  className="flex size-3 shrink-0 items-center justify-center"
+                  style={{
+                    border: `1.5px solid ${on ? BC.lime : BC.pink}`,
+                    background: on ? BC.lime : "transparent",
+                  }}
+                >
+                  {on ? <Check strokeWidth={3.5} color="#050505" className="size-2.5" /> : null}
+                </span>
+                <span className="text-[11px] leading-tight" style={{ color: on ? BC.white : "#555" }}>
+                  {m.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      ))}
+    </>
   );
 }
 

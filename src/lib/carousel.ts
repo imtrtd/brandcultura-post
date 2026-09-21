@@ -62,6 +62,83 @@ export type Slide3 = {
 
 export type KitId = "all" | "mark" | "release" | "system" | "mix";
 
+export type MixMod = { id: string; group: string; label: string };
+
+export const MIX_MODULES: MixMod[] = [
+  { id: "logo-dir", group: "MARK", label: "Logo direction" },
+  { id: "logo-lock", group: "MARK", label: "Logo lockup" },
+  { id: "wordmark", group: "MARK", label: "Wordmark" },
+  { id: "icon-mark", group: "MARK", label: "Icon / mark" },
+  { id: "color-code", group: "MARK", label: "Color code (2)" },
+  { id: "type-pair", group: "MARK", label: "Type pair" },
+  { id: "avatar", group: "MARK", label: "Avatar" },
+  { id: "social-cover", group: "MARK", label: "Social cover" },
+  { id: "usage-guide", group: "MARK", label: "1-page usage guide" },
+  { id: "favicon", group: "MARK", label: "Favicon / app icon" },
+  { id: "single-cover", group: "RELEASE", label: "Single cover" },
+  { id: "stream-sq", group: "RELEASE", label: "Stream square" },
+  { id: "cover-series", group: "RELEASE", label: "Cover series" },
+  { id: "motion-loop", group: "RELEASE", label: "Motion loop" },
+  { id: "poster-flyer", group: "RELEASE", label: "Poster / flyer" },
+  { id: "stage-visual", group: "RELEASE", label: "Stage visual" },
+  { id: "spectro-form", group: "RELEASE", label: "Spectrogram form" },
+  { id: "waveform-id", group: "RELEASE", label: "Waveform identity" },
+  { id: "audit", group: "SITE", label: "Audit: stay / die" },
+  { id: "mini-site", group: "SITE", label: "Mini-site" },
+  { id: "portfolio", group: "SITE", label: "Portfolio page" },
+  { id: "releases-page", group: "SITE", label: "Releases page" },
+  { id: "dates", group: "SITE", label: "Dates / events" },
+  { id: "people", group: "SITE", label: "People / about" },
+  { id: "contact", group: "SITE", label: "Contact" },
+  { id: "collab-block", group: "SITE", label: "Collab-block" },
+  { id: "feed-grid", group: "INST", label: "Feed grid 3–5" },
+  { id: "story-tpl", group: "INST", label: "Story templates" },
+  { id: "highlights", group: "INST", label: "Highlight covers" },
+  { id: "reels-cover", group: "INST", label: "Reels cover" },
+  { id: "carousel-post", group: "INST", label: "Carousel post" },
+  { id: "zones-map", group: "INST", label: "Instagram zones" },
+  { id: "pillars", group: "INST", label: "Content pillars" },
+  { id: "calendar", group: "INST", label: "14-day calendar" },
+  { id: "presskit-pdf", group: "STRATEGY", label: "Presskit PDF" },
+  { id: "presskit-page", group: "STRATEGY", label: "Presskit page" },
+  { id: "positioning", group: "STRATEGY", label: "Positioning" },
+  { id: "tone", group: "STRATEGY", label: "Tone of voice" },
+  { id: "manifest", group: "STRATEGY", label: "Manifest" },
+  { id: "launch-plan", group: "STRATEGY", label: "Launch timing" },
+  { id: "stickers", group: "MERCH", label: "Stickers sheet" },
+  { id: "merch-mock", group: "MERCH", label: "Merch mockup" },
+  { id: "zine", group: "MERCH", label: "Zine / flyer" },
+  { id: "biz-card", group: "MERCH", label: "Business card" },
+  { id: "poster-print", group: "MERCH", label: "Poster print" },
+  { id: "focus-offer", group: "SPECIAL", label: "Focus-group offer" },
+  { id: "promo", group: "SPECIAL", label: "Promo / special" },
+  { id: "personal-2", group: "SPECIAL", label: "Personal · 2 evenings" },
+  { id: "warmup", group: "SPECIAL", label: "Warm-up 7–14 days" },
+  { id: "pay-plan", group: "SPECIAL", label: "Payment plan" },
+];
+
+export const MIX_GROUPS = ["MARK", "RELEASE", "SITE", "INST", "STRATEGY", "MERCH", "SPECIAL"] as const;
+
+export const MIX_COLS: readonly (readonly (typeof MIX_GROUPS)[number][])[] = [
+  ["MARK", "RELEASE"],
+  ["SITE", "INST"],
+  ["STRATEGY", "MERCH", "SPECIAL"],
+];
+
+export function defaultMixOn(on = true): Record<string, boolean> {
+  const out: Record<string, boolean> = {};
+  for (const m of MIX_MODULES) out[m.id] = on;
+  return out;
+}
+
+export function countMix(mixOn: Record<string, boolean>): number {
+  return MIX_MODULES.reduce((n, m) => n + (mixOn[m.id] ? 1 : 0), 0);
+}
+
+export function mixCountLabel(mixOn: Record<string, boolean>): PriceRow {
+  return { label: "Modules ticked", value: `${countMix(mixOn)} / ${MIX_MODULES.length}` };
+}
+
 export type Project = {
   v: 1;
   kit: KitId;
@@ -69,6 +146,7 @@ export type Project = {
   slide1: Slide1;
   slide2: Slide2;
   slide3: Slide3;
+  mixOn: Record<string, boolean>;
   offsets: Record<string, Offset>;
   markSrc: string;
   photoSrc: string | null;
@@ -260,31 +338,26 @@ export const KITS: Record<
       title: "04 MIX",
       subtitle: "YOUR BRIEF",
       body: [
-        "No ready-made step. Your own stack.",
-        "Logo, cover, site, grid, presskit, strategy.",
-        "Merch, stickers, print — if the brief needs it.",
+        "Fifty modules. Tick what the brief needs.",
+        "Logo, cover, site, grid, presskit, merch.",
+        "Stickers, print, special, focus group.",
         "Clear scope and price before we start.",
       ],
-      footerLabel: "MODULES · SPECIAL · ON BRIEF",
+      footerLabel: "50 MODULES · TICK · ON BRIEF",
       footerSlide: "SLIDE 1 / 3",
     },
     slide2: {
       slideNum: "02 / 03",
-      h1: "WHAT'S",
-      h2: "INCLUDED",
-      items: [
-        "Modules from MARK / RELEASE / SYSTEM",
-        "Only what the brief actually needs",
-        "Merch · stickers · print on request",
-        "Two revision rounds, same as fixed kits",
-      ],
+      h1: "TICK",
+      h2: "THE LIST",
+      items: ["Mix checklist"],
     },
     slide3: {
       slideNum: "03 / 03",
       h1: "PRICE",
       h2: "TIMELINE",
       rows: [
-        { label: "List price", value: "on brief" },
+        { label: "Modules ticked", value: `50 / 50` },
         { label: "Focus / Case", value: "quote" },
         { label: "Deposit", value: "by scope" },
         { label: "Duration", value: "by brief" },
@@ -314,9 +387,11 @@ export function slidesFromKit(kit: KitId) {
 }
 
 export function defaultProject(): Project {
+  const mixOn = defaultMixOn(true);
   return {
     v: 1,
-    ...slidesFromKit("all"),
+    ...slidesFromKit("mix"),
+    mixOn,
     layers: { ...DEFAULT_LAYERS },
     offsets: {},
     markSrc: MARK_SRC,
@@ -330,12 +405,14 @@ export function parseProject(raw: unknown): Project | null {
   const p = raw as Partial<Project>;
   if (p.v !== 1 || !p.slide1 || !p.slide2 || !p.slide3) return null;
   const base = defaultProject();
-  const kit = p.kit && p.kit in KITS ? p.kit : "all";
+  const kit = p.kit && p.kit in KITS ? p.kit : "mix";
+  const mixOn = { ...base.mixOn, ...(p.mixOn ?? {}) };
   return {
     ...base,
     ...p,
     v: 1,
     kit,
+    mixOn,
     layers: { ...base.layers, ...(p.layers ?? {}) },
     slide1: { ...base.slide1, ...p.slide1 },
     slide2: { ...base.slide2, ...p.slide2 },
